@@ -62,6 +62,8 @@ export default function SignUp({ setView }) {
           className="text-md w-full py-1"
         >
           {confirmationRequired ? "메일함을 확인해주세요" : "가입하기"}
+          {/*전송된 이메일 클릭하면, supabase서버 거치고
+           local:3000/signup/confirm/?code=1234-1234- 이 형태로 오게된다.*/}
         </Button>
       </div>
       <div className="w-full max-w-lg border border-gray-400 bg-white py-4 text-center">
