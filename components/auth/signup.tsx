@@ -15,6 +15,18 @@ export default function SignUp({ setView }) {
 
   // signUp mutation
 
+  const signInWithKakao = async ()=> {
+    const {data, error} = await supabase.auth.signInWithOAuth({
+      provider : 'kakao',
+      options: {
+        redirectTo: process.env.NEXT_PUBLIC_VERCEL_URL
+          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/auth/callback`
+          : "http://localhost:3000/auth/callback",
+      },
+
+    })
+}
+
   const signupMutation = useMutation({
     mutationFn: async () => {
       const { data, error } = await supabase.auth.signUp({
@@ -109,6 +121,10 @@ export default function SignUp({ setView }) {
           {/*전송된 이메일 클릭하면, supabase서버 거치고
            local:3000/signup/confirm/?code=1234-1234- 이 형태로 오게된다.*/}
         </Button>
+        <Button
+        onClick={()=> signInWithKakao()}
+        className="text-md w-full py-1 bg-yellow-700"
+        >카카오 로그인</Button>
       </div>
       <div className="w-full max-w-lg border border-gray-400 bg-white py-4 text-center">
         이미 계정이 있으신가요?{" "}
