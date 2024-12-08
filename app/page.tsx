@@ -1,9 +1,9 @@
-import LogoutButton from "components/logout-button";
-import { createServerSupabaseClient } from "utils/supabse/server";
+import LogoutButton from 'components/logout-button';
+import { createServerSupabaseClient } from 'utils/supabase/server';
 
 export const metadata = {
-  title: "Inflearngram",
-  description: "Instagram clone project",
+  title: 'Inflearngram',
+  description: 'Instagram clone project',
 };
 
 export default async function Home() {
@@ -15,7 +15,7 @@ export default async function Home() {
   return (
     <main className="flex h-screen w-full flex-col items-center justify-center gap-2">
       <h1 className="text-xl font-bold">
-        Welcome {session?.user?.email?.split("@")?.[0]}!
+        Welcome {session?.user?.email?.split('@')?.[0]}!
       </h1>
       <LogoutButton />
     </main>

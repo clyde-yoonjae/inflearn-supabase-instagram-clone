@@ -1,25 +1,24 @@
-"use client";
+'use client';
 
-import { Button, Input } from "@material-tailwind/react";
-import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
-import { createBrowserSupabaseClient } from "utils/supabse/clients";
+import { Button, Input } from '@material-tailwind/react';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import { createBrowserSupabaseClient } from 'utils/supabase/clients';
 export default function SignIn({ setView }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const supabase = createBrowserSupabaseClient();
 
-  const signInWithKakao = async ()=> {
-      const {data, error} = await supabase.auth.signInWithOAuth({
-        provider : 'kakao',
-        options: {
-          redirectTo: process.env.NEXT_PUBLIC_VERCEL_URL
-            ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/auth/callback`
-            : "http://localhost:3000/auth/callback",
-        },
-
-      })
-  }
+  const signInWithKakao = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'kakao',
+      options: {
+        redirectTo: process.env.NEXT_PUBLIC_VERCEL_URL
+          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/auth/callback`
+          : 'http://localhost:3000/auth/callback',
+      },
+    });
+  };
 
   const signInMutation = useMutation({
     mutationFn: async () => {
@@ -38,7 +37,7 @@ export default function SignIn({ setView }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex w-full max-w-lg flex-col items-center justify-center gap-2 border border-gray-400 bg-white px-10 pb-6 pt-10">
-        <img src={"/images/inflearngram.png"} className="mb-6 w-60" />
+        <img src={'/images/inflearngram.png'} className="mb-6 w-60" />
         <Input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -65,15 +64,17 @@ export default function SignIn({ setView }) {
           로그인
         </Button>
         <Button
-        onClick={()=> signInWithKakao()}
-        className="text-md w-full py-1 bg-yellow-700"
-        >카카오 로그인</Button>
+          onClick={() => signInWithKakao()}
+          className="text-md w-full bg-yellow-700 py-1"
+        >
+          카카오 로그인
+        </Button>
       </div>
       <div className="w-full max-w-lg border border-gray-400 bg-white py-4 text-center">
-        아직 계정이 없으신가요?{" "}
+        아직 계정이 없으신가요?{' '}
         <button
           className="font-bold text-light-blue-600"
-          onClick={() => setView("SIGNUP")}
+          onClick={() => setView('SIGNUP')}
         >
           가입하기
         </button>

@@ -1,7 +1,7 @@
-"use client";
-import { Home, Logout, People, Search, Send } from "@mui/icons-material";
-import Link from "next/link";
-import { createBrowserSupabaseClient } from "utils/supabse/clients";
+'use client';
+import { Home, Logout, People, Search, Send } from '@mui/icons-material';
+import Link from 'next/link';
+import { createBrowserSupabaseClient } from 'utils/supabase/clients';
 export default function Sidebar() {
   const supabase = createBrowserSupabaseClient();
   return (
@@ -23,7 +23,7 @@ export default function Sidebar() {
       </div>
       {/* Logout Button */}
       <div>
-        <button onClick={() => console.log("logout")}>
+        <button onClick={() => console.log('logout')}>
           <Logout
             className="text-2xl text-deep-purple-900"
             onClick={async () => {
