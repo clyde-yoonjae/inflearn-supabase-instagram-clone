@@ -7,16 +7,66 @@ import {
   selectedUserIdState,
   selectedUserIndexState,
 } from 'utils/recoil/atoms';
-import { useQuery } from '@tanstack/react-query';
-import { getUserById } from 'actions/chatActions';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { getAllMessages, getUserById, sendMessage } from 'actions/chatActions';
+import { useEffect, useState } from 'react';
+import { Spinner } from '@material-tailwind/react';
+import { Span } from 'next/dist/trace';
+import { createBrowserSupabaseClient } from 'utils/supabase/clients';
 
 export default function ChatScreen({}) {
   const selectedUserId = useRecoilValue(selectedUserIdState);
   const selectedUserIndex = useRecoilValue(selectedUserIndexState);
+
+  const [message, setMessage] = useState('');
+
+  const supabase = createBrowserSupabaseClient();
+
   const selectedUserQuery = useQuery({
     queryKey: ['user', selectedUserId],
     queryFn: () => getUserById(selectedUserId),
   });
+
+  const sendMessageMutation = useMutation({
+    mutationFn: async () => {
+      return sendMessage({
+        message,
+        chatUserId: selectedUserId,
+      });
+    },
+    onSuccess: () => {
+      setMessage('');
+      getAllMessageQuery.refetch();
+    },
+  });
+
+  const getAllMessageQuery = useQuery({
+    queryKey: ['messages', selectedUserId],
+    queryFn: () => getAllMessages({ chatUserId: selectedUserId }),
+  });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('message_postgres_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'message',
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT' && !payload.errors) {
+            getAllMessageQuery.refetch();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
 
   return selectedUserQuery.data !== null ? (
     <div className="flex h-screen w-full flex-col">
@@ -31,24 +81,28 @@ export default function ChatScreen({}) {
       />
       {/* 채팅 영역 */}
       <div className="flex w-full flex-1 flex-col gap-3 overflow-y-scroll p-4">
-        <Message isFromMe={true} message={'안녕하세요.'} />
-        <Message isFromMe={false} message={'반갑습니다.'} />
-        <Message isFromMe={true} message={'안녕하세요.'} />
-        <Message isFromMe={true} message={'안녕하세요.'} />
-        <Message isFromMe={false} message={'반갑습니다.'} />
-        <Message isFromMe={false} message={'반갑습니다.'} />
+        {getAllMessageQuery.data?.map((message) => (
+          <Message
+            key={message.id}
+            message={message.message}
+            isFromMe={message.receiver === selectedUserId}
+          />
+        ))}
       </div>
       {/* 채팅창 영역 */}
       <div className="flex">
         <input
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
           className="w-full border-2 border-light-blue-600 p-3"
           placeholder="메시지를 입력하세요."
         />
         <button
           className="min-w-20 bg-light-blue-600 p-3 text-white"
           color="light-blue"
+          onClick={() => sendMessageMutation.mutate()}
         >
-          <span>전송</span>
+          {sendMessageMutation.isPending ? <Spinner /> : <span>전송</span>}
         </button>
       </div>
     </div>
